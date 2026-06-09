@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "agent-relay-guard input",
+  "description": "Structured input contract for agent-relay-guard. P0 accepts schema_version 1.0 only.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "card_type",
+    "title",
+    "summary",
+    "risk",
+    "recommended_decision",
+    "decision_reason",
+    "next_action",
+    "detail"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "card_type": {
+      "enum": ["progress", "instruction", "result"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "risk": {
+      "enum": ["low", "medium", "high", "critical", "unknown"]
+    },
+    "recommended_decision": {
+      "enum": ["APPROVE", "HOLD", "REJECT", "REVISE"]
+    },
+    "decision_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overview", "evidence", "changes", "open_questions"],
+      "properties": {
+        "overview": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "changes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

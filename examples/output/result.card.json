@@ -1,0 +1,18 @@
+{
+  "id": "task-042",
+  "card_type": "result",
+  "risk": "low",
+  "title": "Fix flaky timing test in parser module",
+  "summary": "Replaced the sleep-based wait in the parser test with a fake clock. The flaky failure no longer reproduces and the full test suite passes.",
+  "recommended_decision": "APPROVE",
+  "decision_reason": "Small, test-only change with green CI and no production code touched.",
+  "next_action": "Merge the pull request.",
+  "detail_packet_id": "task-042-detail",
+  "redaction_count": 0,
+  "options": [
+    "APPROVE",
+    "HOLD",
+    "REJECT",
+    "REVISE"
+  ]
+}
