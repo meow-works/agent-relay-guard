@@ -181,6 +181,22 @@ delivery adapters are intentionally out of scope.
 The stable public interfaces are the CLI and the JSON Schema. Internal Python
 modules are not a stable API.
 
+## Roadmap
+
+Possible near-term directions include:
+
+- Refine validation diagnostics based on real-world invalid input reports.
+- Add practical, vendor-neutral workflow examples for AI coding agents and
+  maintainer review.
+- Document optional external adapter or wrapper patterns for GitHub comments,
+  Discord, Telegram, and dashboards without adding delivery code to the core.
+- Stabilize the examples and documentation and define criteria for the next
+  tagged release.
+
+These are future maintenance directions, not features included in the current
+release. The core will remain deterministic, offline, and based on structured
+JSON input.
+
 ## Tests
 
 ```bash
