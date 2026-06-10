@@ -37,6 +37,25 @@ layer, not as yet another autonomous agent in the loop.
 - No delivery to Discord/Telegram/etc. (out of scope for this slice).
 - No complete secret scanning (see "Redaction limits").
 
+## How it fits into a review workflow
+
+A typical integration has four steps:
+
+1. An AI coding agent or automation system produces structured JSON that
+   matches the input contract.
+2. `agent-relay-guard` validates the input and renders an approval card and
+   a separate detail packet.
+3. An external delivery layer may post those artifacts to Discord, Telegram,
+   GitHub comments, a dashboard, or another maintainer-facing surface.
+4. The maintainer reviews the short card and opens the detail packet only
+   when more evidence is needed.
+
+`agent-relay-guard` deliberately stops at step 2. Keeping LLM calls, network
+calls, bot tokens, and webhook handling outside the core makes rendering
+deterministic, keeps tests local and reproducible, separates credentials from
+the renderer, and reduces accidental delivery risk. Delivery adapters are
+optional external components and are not included in the current release.
+
 ## Quick start
 
 Requires Python 3.11+. No runtime dependencies.
