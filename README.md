@@ -32,6 +32,8 @@ It does not call an LLM, parse free-form natural language, make network requests
 
 That boundary is intentional. Delivery can be handled later by a wrapper, bot, dashboard, or CI workflow. Keeping delivery outside the core keeps this tool easier to test and avoids mixing rendering logic with tokens, webhooks, or service-specific behavior.
 
+See [external adapter patterns](docs/adapter-patterns.md) for conceptual delivery boundaries. No adapters are included in this repository.
+
 ## How it fits into a review workflow
 
 A practical setup might look like this:
@@ -178,7 +180,6 @@ Near-term directions include:
 
 - improving validation diagnostics as real invalid inputs appear
 - adding practical workflow examples for AI coding agents and maintainers
-- documenting wrapper patterns for GitHub comments, Discord, Telegram, and dashboards without putting delivery code in the core
 - clarifying what should be stable before the next tagged release
 
 These are future maintenance directions, not features included in the current release. The core should stay local, predictable, and based on structured JSON input.
