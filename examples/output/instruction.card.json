@@ -1,0 +1,18 @@
+{
+  "id": "task-063",
+  "card_type": "instruction",
+  "risk": "low",
+  "title": "Proposal: document the default timeout in the README",
+  "summary": "Request for approval to prepare a small documentation-only pull request. No changes have been made yet; this card asks whether the proposed scope is acceptable.",
+  "recommended_decision": "APPROVE",
+  "decision_reason": "Documentation-only proposal with a narrow, clearly bounded scope and no code changes.",
+  "next_action": "If approved, prepare a pull request limited to the README changes listed in the detail packet.",
+  "detail_packet_id": "task-063-detail",
+  "redaction_count": 0,
+  "options": [
+    "APPROVE",
+    "HOLD",
+    "REJECT",
+    "REVISE"
+  ]
+}

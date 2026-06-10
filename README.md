@@ -155,9 +155,8 @@ with `--output`.
 
 ## Current slice limitations
 
-The `result` and `progress` card types are implemented and tested end to end.
-`instruction` is accepted by the schema but ships without samples or
-dedicated tests yet; it will be added in a later slice. Live
+All three card types (`result`, `progress`, and `instruction`) ship with
+examples and end-to-end tests. Live
 delivery adapters are intentionally out of scope.
 
 The stable public interfaces are the CLI and the JSON Schema. Internal Python

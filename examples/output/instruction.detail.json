@@ -1,0 +1,19 @@
+{
+  "id": "task-063",
+  "detail_packet_id": "task-063-detail",
+  "card_type": "instruction",
+  "risk": "low",
+  "overview": "The README's Configuration section does not state the default request timeout, and two users have asked about it in discussions. This card proposes a documentation-only pull request that adds the default value and one override example. Nothing has been changed yet; work starts only after this card is approved.",
+  "evidence": [
+    "Two separate user questions about the default timeout in project discussions",
+    "README Configuration section currently omits the default value"
+  ],
+  "changes": [
+    "Proposed: README.md: state the default timeout value in the Configuration section",
+    "Proposed: README.md: add one example showing how to override the timeout"
+  ],
+  "open_questions": [
+    "Should the override example show seconds or milliseconds?"
+  ],
+  "redaction_count": 0
+}

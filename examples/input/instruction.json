@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "id": "task-063",
+  "card_type": "instruction",
+  "title": "Proposal: document the default timeout in the README",
+  "summary": "Request for approval to prepare a small documentation-only pull request. No changes have been made yet; this card asks whether the proposed scope is acceptable.",
+  "risk": "low",
+  "recommended_decision": "APPROVE",
+  "decision_reason": "Documentation-only proposal with a narrow, clearly bounded scope and no code changes.",
+  "next_action": "If approved, prepare a pull request limited to the README changes listed in the detail packet.",
+  "detail": {
+    "overview": "The README's Configuration section does not state the default request timeout, and two users have asked about it in discussions. This card proposes a documentation-only pull request that adds the default value and one override example. Nothing has been changed yet; work starts only after this card is approved.",
+    "evidence": [
+      "Two separate user questions about the default timeout in project discussions",
+      "README Configuration section currently omits the default value"
+    ],
+    "changes": [
+      "Proposed: README.md: state the default timeout value in the Configuration section",
+      "Proposed: README.md: add one example showing how to override the timeout"
+    ],
+    "open_questions": [
+      "Should the override example show seconds or milliseconds?"
+    ]
+  }
+}

@@ -22,7 +22,7 @@ def run_cli(*args, cwd=None):
     )
 
 
-@pytest.mark.parametrize("input_name", ["result.json", "progress.json"])
+@pytest.mark.parametrize("input_name", ["result.json", "progress.json", "instruction.json"])
 def test_validate_valid_input_exits_zero(input_name):
     result = run_cli("validate", str(EXAMPLES_DIR / "input" / input_name))
     assert result.returncode == 0
@@ -96,7 +96,7 @@ def test_schema_command_prints_valid_json():
     assert schema["properties"]["schema_version"]["const"] == "1.0"
 
 
-@pytest.mark.parametrize("input_name", ["result", "progress"])
+@pytest.mark.parametrize("input_name", ["result", "progress", "instruction"])
 @pytest.mark.parametrize(
     ("args", "golden_suffix"),
     [
