@@ -9,6 +9,7 @@ description = "Convert long AI agent work reports into short approval cards and 
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
+authors = [{ name = "meow-works" }]
 keywords = ["ai-agent", "approval", "maintainer", "cli"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -19,6 +20,10 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/meow-works/agent-relay-guard"
+Repository = "https://github.com/meow-works/agent-relay-guard"
 
 [project.optional-dependencies]
 test = ["pytest"]
