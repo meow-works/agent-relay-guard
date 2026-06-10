@@ -115,6 +115,93 @@ def test_non_object_input_is_rejected():
         validate_input(["not", "an", "object"])
 
 
+def test_top_level_missing_field_message_has_full_path(make_input):
+    data = make_input()
+    del data["risk"]
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    assert "$.risk: required field is missing" in excinfo.value.errors
+
+
+def test_nested_missing_field_message_has_full_path(make_input):
+    data = make_input()
+    del data["detail"]["evidence"]
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    assert "$.detail.evidence: required field is missing" in excinfo.value.errors
+
+
+def test_enum_message_has_path_value_and_allowed_values(make_input):
+    data = make_input()
+    data["risk"] = "severe"
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    [message] = excinfo.value.errors
+    assert message.startswith("$.risk: invalid value 'severe'")
+    for allowed in ("'low'", "'medium'", "'high'", "'critical'", "'unknown'"):
+        assert allowed in message
+
+
+def test_type_message_has_indexed_path_and_json_type_name(make_input):
+    data = make_input()
+    data["detail"]["evidence"] = ["fine", {"nested": "object"}]
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    assert "$.detail.evidence[1]: expected string, got object" in excinfo.value.errors
+
+
+def test_type_message_uses_json_terms_for_other_types(make_input):
+    data = make_input()
+    data["detail"]["changes"] = [True, None]
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    assert "$.detail.changes[0]: expected string, got boolean" in excinfo.value.errors
+    assert "$.detail.changes[1]: expected string, got null" in excinfo.value.errors
+
+
+def test_long_invalid_enum_value_is_truncated(make_input):
+    data = make_input()
+    long_value = "x" * 500
+    data["risk"] = long_value
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    [message] = excinfo.value.errors
+    assert long_value not in message
+    assert "...(truncated)" in message
+    assert len(message) < 250
+
+
+def test_control_characters_in_invalid_value_are_escaped(make_input):
+    data = make_input()
+    data["risk"] = "low\nfake-second-line: looks-official"
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    [message] = excinfo.value.errors
+    assert "\n" not in message
+    assert "\\n" in message
+
+
+def test_unknown_field_with_newline_does_not_break_line_structure(make_input):
+    data = make_input()
+    data["bad\nfield"] = "x"
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    [message] = excinfo.value.errors
+    assert "\n" not in message
+    assert "$.bad\\nfield: unknown field" == message
+
+
+def test_long_unknown_field_name_is_truncated(make_input):
+    data = make_input()
+    data["y" * 500] = "x"
+    with pytest.raises(ValidationError) as excinfo:
+        validate_input(data)
+    [message] = excinfo.value.errors
+    assert "y" * 500 not in message
+    assert "...(truncated)" in message
+    assert len(message) < 250
+
+
 def test_schema_loads_and_declares_version_const():
     schema = load_schema()
     assert schema["properties"]["schema_version"]["const"] == "1.0"

@@ -40,10 +40,16 @@ def test_validate_invalid_json_exits_one(tmp_path):
 def test_validate_schema_violation_exits_one(tmp_path):
     data = json.loads(SAMPLE_INPUT.read_text(encoding="utf-8"))
     data["risk"] = "severe"
+    del data["next_action"]
     bad = tmp_path / "bad_enum.json"
     bad.write_text(json.dumps(data), encoding="utf-8")
     result = run_cli("validate", str(bad))
     assert result.returncode == 1
+    assert result.stdout == ""
+    assert "$.risk" in result.stderr
+    assert "'severe'" in result.stderr
+    assert "$.next_action" in result.stderr
+    assert "required field is missing" in result.stderr
 
 
 def test_missing_input_file_exits_two(tmp_path):

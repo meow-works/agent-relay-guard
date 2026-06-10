@@ -81,23 +81,72 @@ _TYPE_CHECKS = {
     "array": list,
 }
 
+# Python types reported with JSON terminology in error messages.
+_JSON_TYPE_NAMES = {
+    dict: "object",
+    list: "array",
+    str: "string",
+    bool: "boolean",
+    int: "number",
+    float: "number",
+    type(None): "null",
+}
+
+
+def _json_type_name(value) -> str:
+    return _JSON_TYPE_NAMES.get(type(value), type(value).__name__)
+
+
+# User-controlled strings shown in error messages are escaped and truncated so
+# that a hostile or accidental value (very long text, secret-like content,
+# embedded newlines) cannot flood stderr or break its line structure.
+_MAX_DISPLAY_LENGTH = 60
+
+
+def _safe_display(value) -> str:
+    """Render a user-controlled value for an error message.
+
+    ``repr`` escapes control characters; long results are truncated.
+    """
+    text = repr(value)
+    if len(text) > _MAX_DISPLAY_LENGTH:
+        text = text[:_MAX_DISPLAY_LENGTH] + "...(truncated)"
+    return text
+
+
+def _safe_path_segment(key) -> str:
+    """Render a user-controlled field name for use inside a JSON path."""
+    escaped = "".join(
+        ch if ch.isprintable() else ch.encode("unicode_escape").decode("ascii")
+        for ch in str(key)
+    )
+    if len(escaped) > _MAX_DISPLAY_LENGTH:
+        escaped = escaped[:_MAX_DISPLAY_LENGTH] + "...(truncated)"
+    return escaped
+
 
 def _check(value, schema: dict, path: str, errors: list[str]) -> None:
     if "const" in schema:
         if value != schema["const"]:
-            errors.append(f"{path}: must be {schema['const']!r}, got {value!r}")
+            errors.append(
+                f"{path}: invalid value {_safe_display(value)}; the only supported value is "
+                f"{schema['const']!r}"
+            )
         return
 
     if "enum" in schema:
         if value not in schema["enum"]:
-            errors.append(f"{path}: {value!r} is not one of {schema['enum']}")
+            allowed = ", ".join(repr(option) for option in schema["enum"])
+            errors.append(
+                f"{path}: invalid value {_safe_display(value)}; allowed values are: {allowed}"
+            )
         return
 
     expected_type = schema.get("type")
     if expected_type is not None:
         python_type = _TYPE_CHECKS[expected_type]
         if not isinstance(value, python_type) or isinstance(value, bool):
-            errors.append(f"{path}: expected {expected_type}, got {type(value).__name__}")
+            errors.append(f"{path}: expected {expected_type}, got {_json_type_name(value)}")
             return
 
     if expected_type == "string":
@@ -117,11 +166,11 @@ def _check(value, schema: dict, path: str, errors: list[str]) -> None:
         properties = schema.get("properties", {})
         for key in schema.get("required", []):
             if key not in value:
-                errors.append(f"{path}: missing required field {key!r}")
+                errors.append(f"{path}.{key}: required field is missing")
         if schema.get("additionalProperties") is False:
             for key in value:
                 if key not in properties:
-                    errors.append(f"{path}: unknown field {key!r}")
+                    errors.append(f"{path}.{_safe_path_segment(key)}: unknown field")
         for key, sub_schema in properties.items():
             if key in value:
                 _check(value[key], sub_schema, f"{path}.{key}", errors)
