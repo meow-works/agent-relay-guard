@@ -1,0 +1,18 @@
+{
+  "id": "task-051",
+  "card_type": "progress",
+  "risk": "medium",
+  "title": "Add config file linting to the CLI",
+  "summary": "Linting rules and unit tests are implemented and passing locally. One required cross-platform check for Windows path handling has not been run yet.",
+  "recommended_decision": "HOLD",
+  "decision_reason": "Implementation is on track, but the required Windows path handling check is still pending, so the change is not ready to approve.",
+  "next_action": "Run the pending Windows path handling test and attach the results as evidence.",
+  "detail_packet_id": "task-051-detail",
+  "redaction_count": 0,
+  "options": [
+    "APPROVE",
+    "HOLD",
+    "REJECT",
+    "REVISE"
+  ]
+}

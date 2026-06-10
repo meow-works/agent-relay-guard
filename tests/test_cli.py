@@ -22,8 +22,9 @@ def run_cli(*args, cwd=None):
     )
 
 
-def test_validate_valid_input_exits_zero():
-    result = run_cli("validate", str(SAMPLE_INPUT))
+@pytest.mark.parametrize("input_name", ["result.json", "progress.json"])
+def test_validate_valid_input_exits_zero(input_name):
+    result = run_cli("validate", str(EXAMPLES_DIR / "input" / input_name))
     assert result.returncode == 0
     assert "valid" in result.stdout
 
@@ -95,18 +96,20 @@ def test_schema_command_prints_valid_json():
     assert schema["properties"]["schema_version"]["const"] == "1.0"
 
 
+@pytest.mark.parametrize("input_name", ["result", "progress"])
 @pytest.mark.parametrize(
-    ("args", "golden"),
+    ("args", "golden_suffix"),
     [
-        (("render", "--format", "markdown"), "result.card.md"),
-        (("render", "--format", "json"), "result.card.json"),
-        (("detail", "--format", "json"), "result.detail.json"),
-        (("detail", "--format", "markdown"), "result.detail.md"),
+        (("render", "--format", "markdown"), "card.md"),
+        (("render", "--format", "json"), "card.json"),
+        (("detail", "--format", "json"), "detail.json"),
+        (("detail", "--format", "markdown"), "detail.md"),
     ],
 )
-def test_golden_outputs_match_examples(args, golden):
+def test_golden_outputs_match_examples(input_name, args, golden_suffix):
     command, *flags = args
-    result = run_cli(command, str(SAMPLE_INPUT), *flags)
+    input_path = EXAMPLES_DIR / "input" / f"{input_name}.json"
+    result = run_cli(command, str(input_path), *flags)
     assert result.returncode == 0
-    expected = (EXAMPLES_DIR / "output" / golden).read_text(encoding="utf-8")
-    assert result.stdout == expected
+    golden = EXAMPLES_DIR / "output" / f"{input_name}.{golden_suffix}"
+    assert result.stdout == golden.read_text(encoding="utf-8")

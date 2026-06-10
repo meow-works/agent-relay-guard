@@ -1,0 +1,20 @@
+{
+  "id": "task-051",
+  "detail_packet_id": "task-051-detail",
+  "card_type": "progress",
+  "risk": "medium",
+  "overview": "The new lint subcommand validates config files against the documented format and reports line-level errors. Rule definitions, error formatting, and unit tests are complete. The remaining work is a cross-platform check: path normalization on Windows has not been exercised, and one helper uses os.path.join in a way that needs verification there.",
+  "evidence": [
+    "pytest: 41 passed locally on Linux",
+    "lint subcommand verified against 6 sample config files",
+    "Windows path handling check: not yet run"
+  ],
+  "changes": [
+    "src/cli/lint.py: new lint subcommand with rule engine",
+    "tests/test_lint.py: unit tests for all current rules"
+  ],
+  "open_questions": [
+    "Does path normalization behave the same on Windows runners?"
+  ],
+  "redaction_count": 0
+}
