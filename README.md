@@ -43,6 +43,8 @@ A practical setup might look like this:
 
 In other words, this repository is the rendering layer. It is the part that makes the review artifact stable before anything posts it somewhere else.
 
+See the [maintainer review workflow example](examples/workflows/maintainer-review.md) for a concrete walkthrough of the instruction, progress, and result checkpoints.
+
 ## Quick start
 
 Requires Python 3.11+. No runtime dependencies.
