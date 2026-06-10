@@ -1,8 +1,22 @@
 # agent-relay-guard
 
+[![CI](https://github.com/meow-works/agent-relay-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/meow-works/agent-relay-guard/actions/workflows/ci.yml)
+
 Convert long AI coding agent work reports into a short, maintainer-friendly
 **approval card** plus a separated **detail packet** — deterministically,
 offline, with no LLM involved.
+
+## Why this exists
+
+AI coding agents can produce long reports, review notes, and approval
+requests. Maintainers should not have to read pages of unstructured long-form
+output just to decide approve / hold / reject / revise.
+
+`agent-relay-guard` turns structured agent output into a short approval card
+with a fixed set of decisions, and keeps the longer evidence in a separated
+detail packet for when it is actually needed. Because the transformation is
+deterministic and offline — no LLM, no network — it works as a thin review
+layer, not as yet another autonomous agent in the loop.
 
 ## What it does
 
@@ -42,6 +56,43 @@ Or without installing:
 ```bash
 PYTHONPATH=src python3 -m agent_relay_guard.cli render examples/input/result.json
 ```
+
+## Example output
+
+From the structured input in
+[`examples/input/result.json`](examples/input/result.json), `render` produces
+this approval card:
+
+```markdown
+# Fix flaky timing test in parser module (task-042)
+
+- Card type: result
+- Risk: low
+
+## Summary
+
+Replaced the sleep-based wait in the parser test with a fake clock. The flaky
+failure no longer reproduces and the full test suite passes.
+
+## Recommended decision
+
+APPROVE
+
+Reason: Small, test-only change with green CI and no production code touched.
+
+## Next action
+
+Merge the pull request.
+
+## Decision options
+
+1. APPROVE / 2. HOLD / 3. REJECT / 4. REVISE
+
+Detail packet: task-042-detail
+```
+
+The long-form evidence stays out of the card; `detail` renders it separately.
+See [`examples/`](examples/) for the complete input, card, and detail packet.
 
 ## CLI commands
 
@@ -93,13 +144,14 @@ key blocks, and `token` / `secret` / `password` / `api_key` style assignments)
 with `[REDACTED]`. Removing secrets before input is the caller's
 responsibility.
 
-## Repository placement
+## Data boundary
 
-`agent-relay-guard` is an independent OSS repository candidate. Its current
-location is a setup/staging directory only; it contains no business logic,
-customer data, secrets, internal paths, or infrastructure information from
-any other project. Whether it is committed in place or moved to its own
-repository is decided by the owner before any commit.
+This repository is a standalone open-source project. It does not contain
+business logic, customer data, credentials, or private operational details
+from any other project. Inputs are expected to be structured JSON supplied by
+the caller; the tool does not run a persistent service, keep internal
+storage, or send data anywhere. It only writes the output file you request
+with `--output`.
 
 ## Current slice limitations
 
