@@ -2,59 +2,46 @@
 
 [![CI](https://github.com/meow-works/agent-relay-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/meow-works/agent-relay-guard/actions/workflows/ci.yml)
 
-Convert long AI coding agent work reports into a short, maintainer-friendly
-**approval card** plus a separated **detail packet** — deterministically,
-offline, with no LLM involved.
+`agent-relay-guard` is a small local CLI for turning structured reports from AI coding agents into something a maintainer can review quickly: a short approval card and a separate detail packet.
+
+The card is for the decision. The detail packet is for the evidence.
 
 ## Why this exists
 
-AI coding agents can produce long reports, review notes, and approval
-requests. Maintainers should not have to read pages of unstructured long-form
-output just to decide approve / hold / reject / revise.
+AI coding agents can produce useful work, but they can also produce long reports. When every handoff is a wall of text, the maintainer still has to slow down, find the decision point, check the risk, and decide what should happen next.
 
-`agent-relay-guard` turns structured agent output into a short approval card
-with a fixed set of decisions, and keeps the longer evidence in a separated
-detail packet for when it is actually needed. Because the transformation is
-deterministic and offline — no LLM, no network — it works as a thin review
-layer, not as yet another autonomous agent in the loop.
+This project is meant to make that handoff smaller and more consistent. An agent or automation system writes a structured JSON report. `agent-relay-guard` validates it and renders a review card with four possible decisions: `APPROVE`, `HOLD`, `REJECT`, or `REVISE`.
+
+It does not make the decision. It gives the maintainer a steadier surface to make one.
 
 ## What it does
 
-- Reads one structured JSON input describing an agent's report.
-- Validates it against a bundled JSON Schema.
-- Renders a short routine **card** (Markdown or JSON) built only from
-  whitelisted summary fields, with a fixed set of decision options:
-  `APPROVE / HOLD / REJECT / REVISE`.
-- Renders a separated **detail packet** carrying the long-form content
-  (overview, evidence, changes, open questions).
-- Applies simple redaction of high-confidence secret-like values to all
-  output strings and reports a `redaction_count`.
+`agent-relay-guard` reads one structured JSON input and checks it against the bundled schema. From that input, it can render:
+
+- a short approval card in Markdown or JSON
+- a separate detail packet with the longer evidence
+- a `redaction_count` showing how many likely-secret values were replaced
+
+The card only includes summary fields and a reference to the detail packet. Longer material such as evidence, file changes, and open questions stays in the detail output, so the main card stays readable.
 
 ## What it does not do
 
-- No LLM calls, no natural-language parsing — input must already be structured.
-- No network access, no tokens, no external services, no servers.
-- No delivery to Discord/Telegram/etc. (out of scope for this slice).
-- No complete secret scanning (see "Redaction limits").
+This is not an agent, a notification bot, or a hosted service.
+
+It does not call an LLM, parse free-form natural language, make network requests, run a server, or send messages to Discord, Telegram, GitHub comments, or any other destination. It renders local output to stdout or to the file path you choose.
+
+That boundary is intentional. Delivery can be handled later by a wrapper, bot, dashboard, or CI workflow. Keeping delivery outside the core keeps this tool easier to test and avoids mixing rendering logic with tokens, webhooks, or service-specific behavior.
 
 ## How it fits into a review workflow
 
-A typical integration has four steps:
+A practical setup might look like this:
 
-1. An AI coding agent or automation system produces structured JSON that
-   matches the input contract.
-2. `agent-relay-guard` validates the input and renders an approval card and
-   a separate detail packet.
-3. An external delivery layer may post those artifacts to Discord, Telegram,
-   GitHub comments, a dashboard, or another maintainer-facing surface.
-4. The maintainer reviews the short card and opens the detail packet only
-   when more evidence is needed.
+1. An AI coding agent prepares a structured JSON report for a proposed task, current progress, or completed result.
+2. `agent-relay-guard` validates that report and renders the card/detail pair.
+3. Another layer, such as a script, dashboard, GitHub comment workflow, Discord bot, or Telegram bot, can deliver the rendered output.
+4. The maintainer reads the short card first and opens the detail packet only when more context is needed.
 
-`agent-relay-guard` deliberately stops at step 2. Keeping LLM calls, network
-calls, bot tokens, and webhook handling outside the core makes rendering
-deterministic, keeps tests local and reproducible, separates credentials from
-the renderer, and reduces accidental delivery risk. Delivery adapters are
-optional external components and are not included in the current release.
+In other words, this repository is the rendering layer. It is the part that makes the review artifact stable before anything posts it somewhere else.
 
 ## Quick start
 
@@ -183,19 +170,16 @@ modules are not a stable API.
 
 ## Roadmap
 
-Possible near-term directions include:
+The next useful work is not to make the core larger for its own sake. It is to make the review workflow around it easier to understand and safer to build.
 
-- Refine validation diagnostics based on real-world invalid input reports.
-- Add practical, vendor-neutral workflow examples for AI coding agents and
-  maintainer review.
-- Document optional external adapter or wrapper patterns for GitHub comments,
-  Discord, Telegram, and dashboards without adding delivery code to the core.
-- Stabilize the examples and documentation and define criteria for the next
-  tagged release.
+Near-term directions include:
 
-These are future maintenance directions, not features included in the current
-release. The core will remain deterministic, offline, and based on structured
-JSON input.
+- improving validation diagnostics as real invalid inputs appear
+- adding practical workflow examples for AI coding agents and maintainers
+- documenting wrapper patterns for GitHub comments, Discord, Telegram, and dashboards without putting delivery code in the core
+- clarifying what should be stable before the next tagged release
+
+These are future maintenance directions, not features included in the current release. The core should stay local, predictable, and based on structured JSON input.
 
 ## Tests
 
